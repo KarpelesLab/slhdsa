@@ -56,24 +56,7 @@ func (sk *PrivateKey) Sign(rand io.Reader, message []byte, opts crypto.SignerOpt
 // If rand is nil, signing is deterministic. If rand is provided, it supplies
 // entropy for hedged signing which may help against side-channel attacks.
 func (sk *PrivateKey) SignMessage(rand io.Reader, message []byte, opts crypto.SignerOpts) ([]byte, error) {
-	if opts != nil && opts.HashFunc() != 0 {
-		return nil, errors.New("slhdsa: pre-hashed messages not supported")
-	}
-
-	var context []byte
-	if o, ok := opts.(*Options); ok && o != nil {
-		context = o.Context
-	}
-
-	var optRand []byte
-	if rand != nil {
-		optRand = make([]byte, sk.params.n)
-		if _, err := io.ReadFull(rand, optRand); err != nil {
-			return nil, err
-		}
-	}
-
-	return sk.sign(message, context, optRand)
+	return sk.Sign(rand, message, opts)
 }
 
 // sign is the internal signing function.
